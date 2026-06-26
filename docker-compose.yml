@@ -1,0 +1,37 @@
+# version 1.2.0
+services:
+  clipqueue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clipqueue
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8097}:8097"
+    environment:
+      # The entrypoint uses these to make the data and output mounts writable,
+      # then launches the web app as the same Ubuntu UID/GID.
+      PUID: "${PUID:-1000}"
+      PGID: "${PGID:-1000}"
+      APP_DATA: /app/data
+      INPUT_ROOT: /media/input
+      OUTPUT_ROOT: /media/output
+      # A CRF 23 encode is retried with a bitrate cap if it exceeds this fraction
+      # of the original source-file size. Valid range: 0.50 to 1.00.
+      MAX_OUTPUT_SIZE_RATIO: "${MAX_OUTPUT_SIZE_RATIO:-0.98}"
+      TZ: Europe/London
+    volumes:
+      # Source media is readable and deletable from the portal. ClipQueue never
+      # overwrites source files; removal requires an explicit Delete action or
+      # the per-job "Delete original after successful save" option.
+      - ${INPUT_DIR:-./media/input}:/media/input
+      # Completed videos are written here and remain on the Ubuntu host.
+      - ${OUTPUT_DIR:-./media/output}:/media/output
+      # Queue database, job history, and thumbnail cache remain after container rebuilds.
+      - ${DATA_DIR:-./data}:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8097/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
