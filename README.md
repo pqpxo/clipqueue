@@ -11,6 +11,8 @@
   <a href="https://www.swakes.co.uk">SWAKES</a> · <a href="https://github.com/pqpxo/clipqueue">GitHub</a>
 </p>
 
+<details> <summary><strong>Screenshot</strong></summary> <br> <p align="center"> <a href="clipqueue_screenshot.png"> <img src="clipqueue_screenshot.png" alt="Screenshot" width="100%"> </a> </p> </details>
+
 ## Features
 
 - Scan a host-mounted **input** folder into a video gallery.
